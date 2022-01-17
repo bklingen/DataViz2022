@@ -1,0 +1,107 @@
+---
+title: "Chord Diagram"
+author: "Deniz, Mileva, Marina"
+date: "1/16/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Import packages
+
+Potential packages for chord diagrams:  
+1. circilize package (R): It only provides a static chord diagram (Explained here: https://www.r-graph-gallery.com/chord-diagram.html)  
+2. chorddiag package (R): This appears to be the primary R package for an interactive chord diagram. It's built using the JavaScript D3 library. (Further information can be found on the GitHub page: https://github.com/mattflor/chorddiag)   
+3. plotly (Python): Python plotly has functionality to create an interactive chord diagram, but the features are not as refined as those in the chorddiag (R) package. (Documentation: https://plotly.com/python/v3/filled-chord-diagram/)  
+
+Below, we've built an example chord diagram using the chorddiag package and the NCF Alumni data.
+
+```{r cache=TRUE, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(usethis)
+library(devtools)
+library(chorddiag)
+library(RColorBrewer)
+```
+
+# Read Data
+
+```{r}
+alumns <- read.csv(file="./data/NCAlumn.csv")
+#dim(alumns)
+colnames(alumns)
+head(alumns)
+```
+
+# Processing Data
+Recoding Academic programs
+```{r}
+# Recoded factors
+aoc.recoded <- alumns$ACADEMIC_PROGRAM_1 %>% fct_lump(prop=0.01)
+industry.recoded <- fct_lump(alumns$Industry, n=7)
+alumns.recoded <- alumns %>% mutate(Industry = industry.recoded, aoc = aoc.recoded)
+
+# Computation 
+data.aoc <- alumns.recoded %>%
+    drop_na(aoc, Industry) %>%
+    select(aoc, Industry) %>% 
+    mutate(Industry=fct_infreq(Industry)) %>% 
+    filter(Industry != "Other")
+
+as.matrix(table(data.aoc))
+```
+
+Recoding DIVISION_1
+```{r}
+# Recoded factors
+division_1 <- alumns$DIVISION_1
+industry.recoded <- fct_lump(alumns$Industry, n=7)
+alumns.recoded <- alumns %>% mutate(Industry = industry.recoded)
+
+# Computation 
+data.division <- alumns.recoded %>%
+    drop_na(DIVISION_1, Industry) %>%
+    select(DIVISION_1, Industry) %>% 
+    filter(Industry != 'Other' & Industry != '') %>%
+    filter(DIVISION_1 != '') %>%
+    mutate(Industry = droplevels(Industry))
+
+
+as.matrix(table(data.division))
+```
+
+```{r}
+unique(data.division$Industry)
+```
+
+# Chord Diagram
+```{r}
+dataplot <- as.matrix(table(data.division))
+
+dim(as.matrix(dataplot))
+dataplot
+```
+
+```{r}
+# Number of divisions
+num.divisions = length(rownames(dataplot))
+
+# Data/matrix to be plotted
+m <- as.matrix(dataplot)
+m_transpose<- t(m)
+
+division <- rownames(dataplot)
+industry <- colnames(dataplot)
+dimnames(m_transpose) <- list(industry = industry,
+                    division = division)
+
+# Color scheme
+mycols <- brewer.pal(num.divisions ,'Set2')[1:4]
+
+divisionColors <- mycols
+industryColors <- rep('grey', length(industry))
+colors <- c(industryColors, divisionColors)
+
+chorddiag(m_transpose, groupColors = colors, showTicks = F, groupnamePadding = 20, type='bipartite', groupThickness = 0.1)
+```
