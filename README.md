@@ -10,4 +10,4 @@ Team/Task 2: Look into possible packages for Saneky plots.
 Names: Marina, Mileva, Deniz
 
 Team/Task 3: What to do with Double or Triple Majors?
-Names: Paul, Richard, Conor
+Names: Paul, Richard, Conor, Kyle
