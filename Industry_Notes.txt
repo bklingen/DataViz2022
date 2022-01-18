@@ -1,0 +1,41 @@
+-----
+Examples of different industries on same organization
+-----
+Organization Name				Position			Industry
+Environmental Protection Agency			Presidential Management Fellow	Government	
+Environmental Protection Agency (EPA)		ORISE Fellow			Environmental	
+
+
+Johns Hopkins All Childrens Hospital		NICU Registered Nurse		Healthcare	
+Johns Hopkins Kimmel Cancer Center		Physcian			Medical		
+
+Library of Congress				Copyright Acquisitions Librar	Government	
+Library of Congress								Museums and Institutions
+-----
+Multiple industries on same organization:
+-----
+New College
+	Listed as Non Profit, Ed. Services, Higher Ed, Education
+
+Peace Corps
+	Development, Non Profit, Government
+
+Planned Parenthood
+	Non Profit, Healthcare
+
+Roskamp Institute
+	Healthcare, Research (Same job title)
+
+-----
+Notes on filled industry entries
+-----
+Tried to fill with commonly used industry labels where applicable
+Org_Name used as primary criteria, Position as secondary
+Added 'Unknown' Industry
+Added 'Unemployed' Industry
+entrepreneurial endeavors (Founder) coded as industry of company, as per existing entries.  Unclear industries were coded as business
+Energy Companies (Gas,wind,etc.) don't have a category, generally placed under business.  'Energy' industry might be a good option.
+1 entry for homemaker classified under 'unknown'
+HRL Laboratories, LLC	Machine Learning Engineer listed under Engineering.
+
+
