@@ -178,21 +178,26 @@ pre code {
 
 <div id="import-packages" class="section level1">
 <h1>Import packages</h1>
-<p>Potential packages for chord diagrams:<br />
-1. circilize package (R): It only provides a static chord diagram (Explained here: <a href="https://www.r-graph-gallery.com/chord-diagram.html" class="uri">https://www.r-graph-gallery.com/chord-diagram.html</a>)<br />
-2. chorddiag package (R): This appears to be the primary R package for an interactive chord diagram. It’s built using the JavaScript D3 library. (Further information can be found on the GitHub page: <a href="https://github.com/mattflor/chorddiag" class="uri">https://github.com/mattflor/chorddiag</a>)<br />
-3. plotly (Python): Python plotly has functionality to create an interactive chord diagram, but the features are not as refined as those in the chorddiag (R) package. (Documentation: <a href="https://plotly.com/python/v3/filled-chord-diagram/" class="uri">https://plotly.com/python/v3/filled-chord-diagram/</a>)</p>
+<p>Packages for chord diagrams (circular versions of Sankey). Ranked from best to worst:<br />
+1. chorddiag package (R): This is the only R package for an interactive chord diagram. It’s builds on the JavaScript D3 library. (Further information can be found on the GitHub page: <a href="https://github.com/mattflor/chorddiag" class="uri">https://github.com/mattflor/chorddiag</a>). The only downside is it offers fewer parameters to really fine-tune the appearance of the visualization.<br />
+2. circilize package (R): It only provides a static chord diagram (Explained here: <a href="https://www.r-graph-gallery.com/chord-diagram.html" class="uri">https://www.r-graph-gallery.com/chord-diagram.html</a>), but it allows more parameters to tailor the appearance of the visualization than the chorddiag package.<br />
+3. plotly (Python): Python plotly has functionality to create an interactive chord diagram. The interactive design and features are not as nice as those in the chorddiag package (Documentation: <a href="https://plotly.com/python/v3/filled-chord-diagram/" class="uri">https://plotly.com/python/v3/filled-chord-diagram/</a>).</p>
+<p>Packages for Sankey (non-circular):<br />
+1. networkD3 package (R): This appears to be the primary interactive Sankey diagram package. Further research has to be conducted on the customization provided by the package. See an example here: <a href="https://www.data-to-viz.com/graph/sankey.html" class="uri">https://www.data-to-viz.com/graph/sankey.html</a><br />
+2. Plotly Sankey (R): Further research has to be conducted to determine whether this package or the networkD3 will provide better interactive features.<br />
+3. ggalluvial (R): This appears to provide static Sankey plots.</p>
 <p>Below, we’ve built an example chord diagram using the chorddiag package and the NCF Alumni data.</p>
 <pre class="r"><code>library(tidyverse)
 library(ggplot2)
 library(usethis)
 library(devtools)
 library(chorddiag)
-library(RColorBrewer)</code></pre>
+library(RColorBrewer)
+library(magrittr)</code></pre>
 </div>
 <div id="read-data" class="section level1">
 <h1>Read Data</h1>
-<pre class="r"><code>alumns &lt;- read.csv(file=&quot;./data/NCAlumn.csv&quot;)
+<pre class="r"><code>alumns &lt;- read.csv(file=&quot;../data/NCAlumn.csv&quot;)
 #dim(alumns)
 colnames(alumns)</code></pre>
 <pre><code>##  [1] &quot;ID&quot;                 &quot;GRAD_YEAR&quot;          &quot;ACADEMIC_PROGRAM_1&quot;
@@ -248,70 +253,70 @@ alumns.recoded &lt;- alumns %&gt;% mutate(Industry = industry.recoded, aoc = aoc
 data.aoc &lt;- alumns.recoded %&gt;%
     drop_na(aoc, Industry) %&gt;%
     select(aoc, Industry) %&gt;% 
-    mutate(Industry=fct_infreq(Industry)) %&gt;% 
+    mutate(Industry=Industry) %&gt;% 
     filter(Industry != &quot;Other&quot;)
 
 as.matrix(table(data.aoc))</code></pre>
 <pre><code>##                                 Industry
-## aoc                              Other    Education Law Non Profit Healthcare
-##   Anthropology                       0 21        15   2          3          6
-##   Art                                0  9         6   0          0          3
-##   Art History                        0  6         1   2          1          0
-##   Biology                            0 20        17   1          1         10
-##   Biopsychology                      0  8         2   0          1          3
-##   Chemistry                          0 16        11   1          1          7
-##   Classics                           0  1         4   0          1          0
-##   Computer Science                   0  2         2   0          0          0
-##   Economics                          0 21         3   7          2          0
-##   English                            0  6        13   0          4          0
-##   Environmental Studies              0  9         7   2          6          2
-##   History                            0  7         4   4          2          0
-##   Humanities                         0 15        21   6          7          4
-##   Interdisciplinary                  0 13         4   1          2          0
-##   International and Area Studies     0 10         4   2          3          2
-##   Literature                         0  1         9   0          0          0
-##   Marine Biology                     0  8         2   0          1          0
-##   Mathematics                        0  1         8   0          0          0
-##   Music                              0  1         7   0          1          0
-##   Natural Sciences                   0  4         5   1          1          1
-##   Neuroscience                       0  7         1   0          0          1
-##   Philosophy                         0  5         6   3          1          1
-##   Physics                            0  1         7   0          0          0
-##   Political Science                  0 19        11  17          6          0
-##   Psychology                         0 18        29   7         10          7
-##   Social Sciences                    0  5         5   1          0          1
-##   Sociology                          0 12        11   3          4          3
-##   Other                              0 12        17   4          3          1
+## aoc                                 Education Government Healthcare Law
+##   Anthropology                   21        15          2          6   2
+##   Art                             9         6          0          3   0
+##   Art History                     6         1          0          0   2
+##   Biology                        20        17          2         10   1
+##   Biopsychology                   8         2          0          3   0
+##   Chemistry                      16        11          2          7   1
+##   Classics                        1         4          0          0   0
+##   Computer Science                2         2          0          0   0
+##   Economics                      21         3          3          0   7
+##   English                         6        13          0          0   0
+##   Environmental Studies           9         7          5          2   2
+##   History                         7         4          2          0   4
+##   Humanities                     15        21          2          4   6
+##   Interdisciplinary              13         4          1          0   1
+##   International and Area Studies 10         4          1          2   2
+##   Literature                      1         9          1          0   0
+##   Marine Biology                  8         2          1          0   0
+##   Mathematics                     1         8          0          0   0
+##   Music                           1         7          0          0   0
+##   Natural Sciences                4         5          0          1   1
+##   Neuroscience                    7         1          0          1   0
+##   Philosophy                      5         6          0          1   3
+##   Physics                         1         7          0          0   0
+##   Political Science              19        11          8          0  17
+##   Psychology                     18        29          5          7   7
+##   Social Sciences                 5         5          1          1   1
+##   Sociology                      12        11          2          3   3
+##   Other                          12        17          1          1   4
 ##                                 Industry
-## aoc                              Government Software
-##   Anthropology                            2        1
-##   Art                                     0        1
-##   Art History                             0        0
-##   Biology                                 2        0
-##   Biopsychology                           0        0
-##   Chemistry                               2        3
-##   Classics                                0        0
-##   Computer Science                        0        7
-##   Economics                               3        1
-##   English                                 0        2
-##   Environmental Studies                   5        0
-##   History                                 2        2
-##   Humanities                              2        2
-##   Interdisciplinary                       1        1
-##   International and Area Studies          1        1
-##   Literature                              1        0
-##   Marine Biology                          1        0
-##   Mathematics                             0        1
-##   Music                                   0        0
-##   Natural Sciences                        0        1
-##   Neuroscience                            0        0
-##   Philosophy                              0        0
-##   Physics                                 0        2
-##   Political Science                       8        2
-##   Psychology                              5        1
-##   Social Sciences                         1        0
-##   Sociology                               2        0
-##   Other                                   1        0</code></pre>
+## aoc                              Non Profit Software Other
+##   Anthropology                            3        1     0
+##   Art                                     0        1     0
+##   Art History                             1        0     0
+##   Biology                                 1        0     0
+##   Biopsychology                           1        0     0
+##   Chemistry                               1        3     0
+##   Classics                                1        0     0
+##   Computer Science                        0        7     0
+##   Economics                               2        1     0
+##   English                                 4        2     0
+##   Environmental Studies                   6        0     0
+##   History                                 2        2     0
+##   Humanities                              7        2     0
+##   Interdisciplinary                       2        1     0
+##   International and Area Studies          3        1     0
+##   Literature                              0        0     0
+##   Marine Biology                          1        0     0
+##   Mathematics                             0        1     0
+##   Music                                   1        0     0
+##   Natural Sciences                        1        1     0
+##   Neuroscience                            0        0     0
+##   Philosophy                              1        0     0
+##   Physics                                 0        2     0
+##   Political Science                       6        2     0
+##   Psychology                             10        1     0
+##   Social Sciences                         0        0     0
+##   Sociology                               4        0     0
+##   Other                                   3        0     0</code></pre>
 <p>Recoding DIVISION_1</p>
 <pre class="r"><code># Recoded factors
 division_1 &lt;- alumns$DIVISION_1
@@ -368,11 +373,24 @@ mycols &lt;- brewer.pal(num.divisions ,&#39;Set2&#39;)[1:4]
 
 divisionColors &lt;- mycols
 industryColors &lt;- rep(&#39;grey&#39;, length(industry))
-colors &lt;- c(industryColors, divisionColors)
-
-chorddiag(m_transpose, groupColors = colors, showTicks = F, groupnamePadding = 20, type=&#39;bipartite&#39;, groupThickness = 0.1)</code></pre>
-<div id="htmlwidget-3bd6d4d0c80cb0aa84f5" style="width:672px;height:480px;" class="chorddiag html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3bd6d4d0c80cb0aa84f5">{"x":{"matrix":[[0,0,0,0,0,0,80,20,52,79],[0,0,0,0,0,0,3,8,5,23],[0,0,0,0,0,0,8,8,18,18],[0,0,0,0,0,0,12,7,3,42],[0,0,0,0,0,0,17,13,4,27],[0,0,0,0,0,0,5,2,14,7],[80,3,8,12,17,5,0,0,0,0],[20,8,8,7,13,2,0,0,0,0],[52,5,18,3,4,14,0,0,0,0],[79,23,18,42,27,7,0,0,0,0]],"options":{"type":"bipartite","width":null,"height":null,"margin":100,"showGroupnames":true,"groupNames":["Education","Government","Healthcare","Law","Non Profit","Software","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"groupColors":["grey","grey","grey","grey","grey","grey","#66C2A5","#FC8D62","#8DA0CB","#E78AC3"],"groupThickness":0.1,"groupPadding":0.0349065850398866,"groupnamePadding":[20,20,20,20,20,20,20,20,20,20],"groupnameFontsize":18,"groupedgeColor":null,"chordedgeColor":"#808080","categoryNames":["industry","division"],"categorynamePadding":100,"categorynameFontsize":28,"showTicks":false,"tickInterval":1,"ticklabelFontsize":10,"fadeLevel":0.1,"showTooltips":true,"showZeroTooltips":true,"tooltipNames":["Education","Government","Healthcare","Law","Non Profit","Software","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"tooltipFontsize":12,"tooltipUnit":"","tooltipGroupConnector":" &#x25B6; ","precision":"null","clickAction":null,"clickGroupAction":null}},"evals":[],"jsHooks":[]}</script>
+colors &lt;- c(industryColors, divisionColors)</code></pre>
+</div>
+<div id="chord-diagram-1" class="section level1">
+<h1>Chord Diagram</h1>
+<pre class="r"><code>chorddiag(data = m_transpose, 
+          type=&#39;bipartite&#39;,
+          groupColors = colors, 
+          groupThickness = 0.05,
+          groupnamePadding = 10,
+          groupnameFontsize = 15,
+          showTicks = F, 
+          categoryNames = c(&#39;Industry&#39;, &#39;Academic Division&#39;), 
+          categorynamePadding = 150, 
+          categorynameFontsize = 25, 
+          fadeLevel = 0.1, 
+          tooltipUnit = &#39; students&#39;)</code></pre>
+<div id="htmlwidget-f634fc6d234dc727d038" style="width:672px;height:480px;" class="chorddiag html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f634fc6d234dc727d038">{"x":{"matrix":[[0,0,0,0,0,0,80,20,52,79],[0,0,0,0,0,0,3,8,5,23],[0,0,0,0,0,0,8,8,18,18],[0,0,0,0,0,0,12,7,3,42],[0,0,0,0,0,0,17,13,4,27],[0,0,0,0,0,0,5,2,14,7],[80,3,8,12,17,5,0,0,0,0],[20,8,8,7,13,2,0,0,0,0],[52,5,18,3,4,14,0,0,0,0],[79,23,18,42,27,7,0,0,0,0]],"options":{"type":"bipartite","width":null,"height":null,"margin":100,"showGroupnames":true,"groupNames":["Education","Government","Healthcare","Law","Non Profit","Software","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"groupColors":["grey","grey","grey","grey","grey","grey","#66C2A5","#FC8D62","#8DA0CB","#E78AC3"],"groupThickness":0.05,"groupPadding":0.0349065850398866,"groupnamePadding":[10,10,10,10,10,10,10,10,10,10],"groupnameFontsize":15,"groupedgeColor":null,"chordedgeColor":"#808080","categoryNames":["Industry","Academic Division"],"categorynamePadding":150,"categorynameFontsize":25,"showTicks":false,"tickInterval":1,"ticklabelFontsize":10,"fadeLevel":0.1,"showTooltips":true,"showZeroTooltips":true,"tooltipNames":["Education","Government","Healthcare","Law","Non Profit","Software","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"tooltipFontsize":12,"tooltipUnit":" students","tooltipGroupConnector":" &#x25B6; ","precision":"null","clickAction":null,"clickGroupAction":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 
 

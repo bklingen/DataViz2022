@@ -9,10 +9,15 @@ output:
 
 # Import packages
 
-Potential packages for chord diagrams:  
-1. circilize package (R): It only provides a static chord diagram (Explained here: https://www.r-graph-gallery.com/chord-diagram.html)  
-2. chorddiag package (R): This appears to be the primary R package for an interactive chord diagram. It's built using the JavaScript D3 library. (Further information can be found on the GitHub page: https://github.com/mattflor/chorddiag)   
-3. plotly (Python): Python plotly has functionality to create an interactive chord diagram, but the features are not as refined as those in the chorddiag (R) package. (Documentation: https://plotly.com/python/v3/filled-chord-diagram/)  
+Packages for chord diagrams (circular versions of Sankey). Ranked from best to worst:  
+1. chorddiag package (R): This is the only R package for an interactive chord diagram. It's builds on the JavaScript D3 library. (Further information can be found on the GitHub page: https://github.com/mattflor/chorddiag). The only downside is it offers fewer parameters to really fine-tune the appearance of the visualization.  
+2. circilize package (R): It only provides a static chord diagram (Explained here: https://www.r-graph-gallery.com/chord-diagram.html), but it allows more parameters to tailor the appearance of the visualization than the chorddiag package.  
+3. plotly (Python): Python plotly has functionality to create an interactive chord diagram. The interactive design and features are not as nice as those in the chorddiag package (Documentation: https://plotly.com/python/v3/filled-chord-diagram/).  
+
+Packages for Sankey (non-circular):  
+1. networkD3 package (R): This appears to be the primary interactive Sankey diagram package. Further research has to be conducted on the customization provided by the package. See an example here: https://www.data-to-viz.com/graph/sankey.html  
+2. Plotly Sankey (R): Further research has to be conducted to determine whether this package or the networkD3 will provide better interactive features.  
+3. ggalluvial (R): This appears to provide static Sankey plots.  
 
 Below, we've built an example chord diagram using the chorddiag package and the NCF Alumni data.
 
@@ -23,12 +28,13 @@ library(usethis)
 library(devtools)
 library(chorddiag)
 library(RColorBrewer)
+library(magrittr)
 ```
 
 # Read Data
 
 ```{r}
-alumns <- read.csv(file="./data/NCAlumn.csv")
+alumns <- read.csv(file="../data/NCAlumn.csv")
 #dim(alumns)
 colnames(alumns)
 head(alumns)
@@ -46,7 +52,7 @@ alumns.recoded <- alumns %>% mutate(Industry = industry.recoded, aoc = aoc.recod
 data.aoc <- alumns.recoded %>%
     drop_na(aoc, Industry) %>%
     select(aoc, Industry) %>% 
-    mutate(Industry=fct_infreq(Industry)) %>% 
+    mutate(Industry=Industry) %>% 
     filter(Industry != "Other")
 
 as.matrix(table(data.aoc))
@@ -102,6 +108,21 @@ mycols <- brewer.pal(num.divisions ,'Set2')[1:4]
 divisionColors <- mycols
 industryColors <- rep('grey', length(industry))
 colors <- c(industryColors, divisionColors)
-
-chorddiag(m_transpose, groupColors = colors, showTicks = F, groupnamePadding = 20, type='bipartite', groupThickness = 0.1)
 ```
+
+# Chord Diagram
+```{r}
+chorddiag(data = m_transpose, 
+          type='bipartite',
+          groupColors = colors, 
+          groupThickness = 0.05,
+          groupnamePadding = 10,
+          groupnameFontsize = 15,
+          showTicks = F, 
+          categoryNames = c('Industry', 'Academic Division'), 
+          categorynamePadding = 150, 
+          categorynameFontsize = 25, 
+          fadeLevel = 0.1, 
+          tooltipUnit = ' students')
+```
+
