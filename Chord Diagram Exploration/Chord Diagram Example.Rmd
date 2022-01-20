@@ -16,7 +16,7 @@ Packages for chord diagrams (circular versions of Sankey). Ranked from best to w
 
 Packages for Sankey (non-circular):  
 1. networkD3 package (R): This appears to be the primary interactive Sankey diagram package. Further research has to be conducted on the customization provided by the package. See an example here: https://www.data-to-viz.com/graph/sankey.html  
-2. Plotly Sankey (R): Further research has to be conducted to determine whether this package or the networkD3 will provide better interactive features.  
+2. Plotly Sankey (R): Further research has to be conducted to determine whether this package or the networkD3 will provide better interactive features. (Documentation here: https://plotly.com/r/sankey-diagram/)   
 3. ggalluvial (R): This appears to provide static Sankey plots.  
 
 Below, we've built an example chord diagram using the chorddiag package and the NCF Alumni data.
@@ -29,43 +29,26 @@ library(devtools)
 library(chorddiag)
 library(RColorBrewer)
 library(magrittr)
+library(forcats)
 ```
 
 # Read Data
-
 ```{r}
 alumns <- read.csv(file="../data/NCAlumn.csv")
 #dim(alumns)
 colnames(alumns)
-head(alumns)
 ```
 
-# Processing Data
-Recoding Academic programs
+# Processing academic divisions and industries
 ```{r}
 # Recoded factors
-aoc.recoded <- alumns$ACADEMIC_PROGRAM_1 %>% fct_lump(prop=0.01)
-industry.recoded <- fct_lump(alumns$Industry, n=7)
-alumns.recoded <- alumns %>% mutate(Industry = industry.recoded, aoc = aoc.recoded)
+division_1.recoded <- alumns$DIVISION_1
+industry.recoded <- fct_rev(fct_infreq(fct_lump(alumns$Industry, n=7)))
+alumns.recoded <- alumns %>% mutate(
+  DIVISION_1 = division_1.recoded,
+  Industry = industry.recoded)
 
-# Computation 
-data.aoc <- alumns.recoded %>%
-    drop_na(aoc, Industry) %>%
-    select(aoc, Industry) %>% 
-    mutate(Industry=Industry) %>% 
-    filter(Industry != "Other")
-
-as.matrix(table(data.aoc))
-```
-
-Recoding DIVISION_1
-```{r}
-# Recoded factors
-division_1 <- alumns$DIVISION_1
-industry.recoded <- fct_lump(alumns$Industry, n=7)
-alumns.recoded <- alumns %>% mutate(Industry = industry.recoded)
-
-# Computation 
+# Processing data 
 data.division <- alumns.recoded %>%
     drop_na(DIVISION_1, Industry) %>%
     select(DIVISION_1, Industry) %>% 
@@ -73,36 +56,31 @@ data.division <- alumns.recoded %>%
     filter(DIVISION_1 != '') %>%
     mutate(Industry = droplevels(Industry))
 
-
 as.matrix(table(data.division))
 ```
 
-```{r}
-unique(data.division$Industry)
-```
-
-# Chord Diagram
+# Data for Visualization
 ```{r}
 dataplot <- as.matrix(table(data.division))
 
-dim(as.matrix(dataplot))
-dataplot
+# Data/matrix to be plotted
+m <- dataplot
+m_transpose <- t(m)
+
+m_transpose
 ```
 
+# Chord Diagram
+
+#### Chord diagram setup
 ```{r}
 # Number of divisions
 num.divisions = length(rownames(dataplot))
 
-# Data/matrix to be plotted
-m <- as.matrix(dataplot)
-m_transpose<- t(m)
-
 division <- rownames(dataplot)
 industry <- colnames(dataplot)
-dimnames(m_transpose) <- list(industry = industry,
-                    division = division)
 
-# Color scheme
+# Colors
 mycols <- brewer.pal(num.divisions ,'Set2')[1:4]
 
 divisionColors <- mycols
@@ -110,7 +88,7 @@ industryColors <- rep('grey', length(industry))
 colors <- c(industryColors, divisionColors)
 ```
 
-# Chord Diagram
+#### Chord diagram visualization
 ```{r}
 chorddiag(data = m_transpose, 
           type='bipartite',
@@ -121,7 +99,7 @@ chorddiag(data = m_transpose,
           showTicks = F, 
           categoryNames = c('Industry', 'Academic Division'), 
           categorynamePadding = 150, 
-          categorynameFontsize = 25, 
+          categorynameFontsize = 20, 
           fadeLevel = 0.1, 
           tooltipUnit = ' students')
 ```

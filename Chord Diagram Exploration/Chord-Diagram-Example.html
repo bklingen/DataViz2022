@@ -184,7 +184,7 @@ pre code {
 3. plotly (Python): Python plotly has functionality to create an interactive chord diagram. The interactive design and features are not as nice as those in the chorddiag package (Documentation: <a href="https://plotly.com/python/v3/filled-chord-diagram/" class="uri">https://plotly.com/python/v3/filled-chord-diagram/</a>).</p>
 <p>Packages for Sankey (non-circular):<br />
 1. networkD3 package (R): This appears to be the primary interactive Sankey diagram package. Further research has to be conducted on the customization provided by the package. See an example here: <a href="https://www.data-to-viz.com/graph/sankey.html" class="uri">https://www.data-to-viz.com/graph/sankey.html</a><br />
-2. Plotly Sankey (R): Further research has to be conducted to determine whether this package or the networkD3 will provide better interactive features.<br />
+2. Plotly Sankey (R): Further research has to be conducted to determine whether this package or the networkD3 will provide better interactive features. (Documentation here: <a href="https://plotly.com/r/sankey-diagram/" class="uri">https://plotly.com/r/sankey-diagram/</a>)<br />
 3. ggalluvial (R): This appears to provide static Sankey plots.</p>
 <p>Below, we’ve built an example chord diagram using the chorddiag package and the NCF Alumni data.</p>
 <pre class="r"><code>library(tidyverse)
@@ -193,7 +193,8 @@ library(usethis)
 library(devtools)
 library(chorddiag)
 library(RColorBrewer)
-library(magrittr)</code></pre>
+library(magrittr)
+library(forcats)</code></pre>
 </div>
 <div id="read-data" class="section level1">
 <h1>Read Data</h1>
@@ -204,126 +205,17 @@ colnames(alumns)</code></pre>
 ##  [4] &quot;DIVISION_1&quot;         &quot;ACADEMIC_PROGRAM_2&quot; &quot;DIVISION_2&quot;        
 ##  [7] &quot;ACADEMIC_PROGRAM_3&quot; &quot;DIVISION_3&quot;         &quot;Org_Name&quot;          
 ## [10] &quot;Position&quot;           &quot;Industry&quot;</code></pre>
-<pre class="r"><code>head(alumns)</code></pre>
-<pre><code>##    ID GRAD_YEAR    ACADEMIC_PROGRAM_1        DIVISION_1
-## 1 889      2013     Political Science   Social Sciences
-## 2 890      2020     Political Science   Social Sciences
-## 3 893      2011     Political Science   Social Sciences
-## 4  67      2007 Environmental Studies Interdisciplinary
-## 5 688      2018            Literature        Humanities
-## 6  80      2003     Political Science   Social Sciences
-##               ACADEMIC_PROGRAM_2        DIVISION_2
-## 1 International and Area Studies Interdisciplinary
-## 2 International and Area Studies Interdisciplinary
-## 3                   Anthropology   Social Sciences
-## 4                   Anthropology   Social Sciences
-## 5                   Anthropology   Social Sciences
-## 6                   Anthropology   Social Sciences
-##                ACADEMIC_PROGRAM_3 DIVISION_3
-## 1 Spanish Language and Literature Humanities
-## 2 Spanish Language and Literature Humanities
-## 3                                           
-## 4                                           
-## 5                                           
-## 6                                           
-##                                      Org_Name                          Position
-## 1                            Voice of America               Program Coordinator
-## 2              Multicultural Health Institute Latine COVID Outreach Coordinator
-## 3 South Asia Institute at Columbia University          Administrative Assistant
-## 4                                   DanceSafe                Executive Director
-## 5                 Sarasota Contemporary Dance                   General Manager
-## 6                    Dakota Lithium Batteries                               CEO
-##          Industry
-## 1                
-## 2   Public Health
-## 3       Education
-## 4      Non Profit
-## 5 Performing Arts
-## 6</code></pre>
 </div>
-<div id="processing-data" class="section level1">
-<h1>Processing Data</h1>
-<p>Recoding Academic programs</p>
+<div id="processing-academic-divisions-and-industries" class="section level1">
+<h1>Processing academic divisions and industries</h1>
 <pre class="r"><code># Recoded factors
-aoc.recoded &lt;- alumns$ACADEMIC_PROGRAM_1 %&gt;% fct_lump(prop=0.01)
-industry.recoded &lt;- fct_lump(alumns$Industry, n=7)
-alumns.recoded &lt;- alumns %&gt;% mutate(Industry = industry.recoded, aoc = aoc.recoded)
+division_1.recoded &lt;- alumns$DIVISION_1
+industry.recoded &lt;- fct_rev(fct_infreq(fct_lump(alumns$Industry, n=7)))
+alumns.recoded &lt;- alumns %&gt;% mutate(
+  DIVISION_1 = division_1.recoded,
+  Industry = industry.recoded)
 
-# Computation 
-data.aoc &lt;- alumns.recoded %&gt;%
-    drop_na(aoc, Industry) %&gt;%
-    select(aoc, Industry) %&gt;% 
-    mutate(Industry=Industry) %&gt;% 
-    filter(Industry != &quot;Other&quot;)
-
-as.matrix(table(data.aoc))</code></pre>
-<pre><code>##                                 Industry
-## aoc                                 Education Government Healthcare Law
-##   Anthropology                   21        15          2          6   2
-##   Art                             9         6          0          3   0
-##   Art History                     6         1          0          0   2
-##   Biology                        20        17          2         10   1
-##   Biopsychology                   8         2          0          3   0
-##   Chemistry                      16        11          2          7   1
-##   Classics                        1         4          0          0   0
-##   Computer Science                2         2          0          0   0
-##   Economics                      21         3          3          0   7
-##   English                         6        13          0          0   0
-##   Environmental Studies           9         7          5          2   2
-##   History                         7         4          2          0   4
-##   Humanities                     15        21          2          4   6
-##   Interdisciplinary              13         4          1          0   1
-##   International and Area Studies 10         4          1          2   2
-##   Literature                      1         9          1          0   0
-##   Marine Biology                  8         2          1          0   0
-##   Mathematics                     1         8          0          0   0
-##   Music                           1         7          0          0   0
-##   Natural Sciences                4         5          0          1   1
-##   Neuroscience                    7         1          0          1   0
-##   Philosophy                      5         6          0          1   3
-##   Physics                         1         7          0          0   0
-##   Political Science              19        11          8          0  17
-##   Psychology                     18        29          5          7   7
-##   Social Sciences                 5         5          1          1   1
-##   Sociology                      12        11          2          3   3
-##   Other                          12        17          1          1   4
-##                                 Industry
-## aoc                              Non Profit Software Other
-##   Anthropology                            3        1     0
-##   Art                                     0        1     0
-##   Art History                             1        0     0
-##   Biology                                 1        0     0
-##   Biopsychology                           1        0     0
-##   Chemistry                               1        3     0
-##   Classics                                1        0     0
-##   Computer Science                        0        7     0
-##   Economics                               2        1     0
-##   English                                 4        2     0
-##   Environmental Studies                   6        0     0
-##   History                                 2        2     0
-##   Humanities                              7        2     0
-##   Interdisciplinary                       2        1     0
-##   International and Area Studies          3        1     0
-##   Literature                              0        0     0
-##   Marine Biology                          1        0     0
-##   Mathematics                             0        1     0
-##   Music                                   1        0     0
-##   Natural Sciences                        1        1     0
-##   Neuroscience                            0        0     0
-##   Philosophy                              1        0     0
-##   Physics                                 0        2     0
-##   Political Science                       6        2     0
-##   Psychology                             10        1     0
-##   Social Sciences                         0        0     0
-##   Sociology                               4        0     0
-##   Other                                   3        0     0</code></pre>
-<p>Recoding DIVISION_1</p>
-<pre class="r"><code># Recoded factors
-division_1 &lt;- alumns$DIVISION_1
-industry.recoded &lt;- fct_lump(alumns$Industry, n=7)
-alumns.recoded &lt;- alumns %&gt;% mutate(Industry = industry.recoded)
-
-# Computation 
+# Processing data 
 data.division &lt;- alumns.recoded %&gt;%
     drop_na(DIVISION_1, Industry) %&gt;%
     select(DIVISION_1, Industry) %&gt;% 
@@ -331,52 +223,51 @@ data.division &lt;- alumns.recoded %&gt;%
     filter(DIVISION_1 != &#39;&#39;) %&gt;%
     mutate(Industry = droplevels(Industry))
 
-
 as.matrix(table(data.division))</code></pre>
 <pre><code>##                    Industry
-## DIVISION_1          Education Government Healthcare Law Non Profit Software
-##   Humanities               80          3          8  12         17        5
-##   Interdisciplinary        20          8          8   7         13        2
-##   Natural Sciences         52          5         18   3          4       14
-##   Social Sciences          79         23         18  42         27        7</code></pre>
-<pre class="r"><code>unique(data.division$Industry)</code></pre>
-<pre><code>## [1] Education  Non Profit Government Software   Law        Healthcare
-## Levels: Education Government Healthcare Law Non Profit Software</code></pre>
+## DIVISION_1          Software Government Healthcare Non Profit Law Education
+##   Humanities               5          3          8         17  12        80
+##   Interdisciplinary        2          8          8         13   7        20
+##   Natural Sciences        14          5         18          4   3        52
+##   Social Sciences          7         23         18         27  42        79</code></pre>
+</div>
+<div id="data-for-visualization" class="section level1">
+<h1>Data for Visualization</h1>
+<pre class="r"><code>dataplot &lt;- as.matrix(table(data.division))
+
+# Data/matrix to be plotted
+m &lt;- dataplot
+m_transpose &lt;- t(m)
+
+m_transpose</code></pre>
+<pre><code>##             DIVISION_1
+## Industry     Humanities Interdisciplinary Natural Sciences Social Sciences
+##   Software            5                 2               14               7
+##   Government          3                 8                5              23
+##   Healthcare          8                 8               18              18
+##   Non Profit         17                13                4              27
+##   Law                12                 7                3              42
+##   Education          80                20               52              79</code></pre>
 </div>
 <div id="chord-diagram" class="section level1">
 <h1>Chord Diagram</h1>
-<pre class="r"><code>dataplot &lt;- as.matrix(table(data.division))
-
-dim(as.matrix(dataplot))</code></pre>
-<pre><code>## [1] 4 6</code></pre>
-<pre class="r"><code>dataplot</code></pre>
-<pre><code>##                    Industry
-## DIVISION_1          Education Government Healthcare Law Non Profit Software
-##   Humanities               80          3          8  12         17        5
-##   Interdisciplinary        20          8          8   7         13        2
-##   Natural Sciences         52          5         18   3          4       14
-##   Social Sciences          79         23         18  42         27        7</code></pre>
+<div id="chord-diagram-setup" class="section level4">
+<h4>Chord diagram setup</h4>
 <pre class="r"><code># Number of divisions
 num.divisions = length(rownames(dataplot))
 
-# Data/matrix to be plotted
-m &lt;- as.matrix(dataplot)
-m_transpose&lt;- t(m)
-
 division &lt;- rownames(dataplot)
 industry &lt;- colnames(dataplot)
-dimnames(m_transpose) &lt;- list(industry = industry,
-                    division = division)
 
-# Color scheme
+# Colors
 mycols &lt;- brewer.pal(num.divisions ,&#39;Set2&#39;)[1:4]
 
 divisionColors &lt;- mycols
 industryColors &lt;- rep(&#39;grey&#39;, length(industry))
 colors &lt;- c(industryColors, divisionColors)</code></pre>
 </div>
-<div id="chord-diagram-1" class="section level1">
-<h1>Chord Diagram</h1>
+<div id="chord-diagram-visualization" class="section level4">
+<h4>Chord diagram visualization</h4>
 <pre class="r"><code>chorddiag(data = m_transpose, 
           type=&#39;bipartite&#39;,
           groupColors = colors, 
@@ -386,11 +277,12 @@ colors &lt;- c(industryColors, divisionColors)</code></pre>
           showTicks = F, 
           categoryNames = c(&#39;Industry&#39;, &#39;Academic Division&#39;), 
           categorynamePadding = 150, 
-          categorynameFontsize = 25, 
+          categorynameFontsize = 20, 
           fadeLevel = 0.1, 
           tooltipUnit = &#39; students&#39;)</code></pre>
-<div id="htmlwidget-f634fc6d234dc727d038" style="width:672px;height:480px;" class="chorddiag html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f634fc6d234dc727d038">{"x":{"matrix":[[0,0,0,0,0,0,80,20,52,79],[0,0,0,0,0,0,3,8,5,23],[0,0,0,0,0,0,8,8,18,18],[0,0,0,0,0,0,12,7,3,42],[0,0,0,0,0,0,17,13,4,27],[0,0,0,0,0,0,5,2,14,7],[80,3,8,12,17,5,0,0,0,0],[20,8,8,7,13,2,0,0,0,0],[52,5,18,3,4,14,0,0,0,0],[79,23,18,42,27,7,0,0,0,0]],"options":{"type":"bipartite","width":null,"height":null,"margin":100,"showGroupnames":true,"groupNames":["Education","Government","Healthcare","Law","Non Profit","Software","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"groupColors":["grey","grey","grey","grey","grey","grey","#66C2A5","#FC8D62","#8DA0CB","#E78AC3"],"groupThickness":0.05,"groupPadding":0.0349065850398866,"groupnamePadding":[10,10,10,10,10,10,10,10,10,10],"groupnameFontsize":15,"groupedgeColor":null,"chordedgeColor":"#808080","categoryNames":["Industry","Academic Division"],"categorynamePadding":150,"categorynameFontsize":25,"showTicks":false,"tickInterval":1,"ticklabelFontsize":10,"fadeLevel":0.1,"showTooltips":true,"showZeroTooltips":true,"tooltipNames":["Education","Government","Healthcare","Law","Non Profit","Software","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"tooltipFontsize":12,"tooltipUnit":" students","tooltipGroupConnector":" &#x25B6; ","precision":"null","clickAction":null,"clickGroupAction":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-07640ce1dacdd209acae" style="width:672px;height:480px;" class="chorddiag html-widget"></div>
+<script type="application/json" data-for="htmlwidget-07640ce1dacdd209acae">{"x":{"matrix":[[0,0,0,0,0,0,5,2,14,7],[0,0,0,0,0,0,3,8,5,23],[0,0,0,0,0,0,8,8,18,18],[0,0,0,0,0,0,17,13,4,27],[0,0,0,0,0,0,12,7,3,42],[0,0,0,0,0,0,80,20,52,79],[5,3,8,17,12,80,0,0,0,0],[2,8,8,13,7,20,0,0,0,0],[14,5,18,4,3,52,0,0,0,0],[7,23,18,27,42,79,0,0,0,0]],"options":{"type":"bipartite","width":null,"height":null,"margin":100,"showGroupnames":true,"groupNames":["Software","Government","Healthcare","Non Profit","Law","Education","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"groupColors":["grey","grey","grey","grey","grey","grey","#66C2A5","#FC8D62","#8DA0CB","#E78AC3"],"groupThickness":0.05,"groupPadding":0.0349065850398866,"groupnamePadding":[10,10,10,10,10,10,10,10,10,10],"groupnameFontsize":15,"groupedgeColor":null,"chordedgeColor":"#808080","categoryNames":["Industry","Academic Division"],"categorynamePadding":150,"categorynameFontsize":20,"showTicks":false,"tickInterval":1,"ticklabelFontsize":10,"fadeLevel":0.1,"showTooltips":true,"showZeroTooltips":true,"tooltipNames":["Software","Government","Healthcare","Non Profit","Law","Education","Humanities","Interdisciplinary","Natural Sciences","Social Sciences"],"tooltipFontsize":12,"tooltipUnit":" students","tooltipGroupConnector":" &#x25B6; ","precision":"null","clickAction":null,"clickGroupAction":null}},"evals":[],"jsHooks":[]}</script>
+</div>
 </div>
 
 
