@@ -1,0 +1,107 @@
+---
+title: "NCF_Careers_Sankey"
+author: "Mileva Van Tuyl"
+date: "1/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Imports
+```{r}
+library(tidyverse)
+library(sankeywheel)
+library(highcharter)
+library(DT)
+```
+
+# Sankey Wheel Test
+```{r}
+# Data
+DT::datatable(sankeydf)
+```
+
+```{r}
+# Visualization
+sankeywheel(from = sankeydf$from, 
+            to = sankeydf$to, 
+            weight = sankeydf$weight, 
+            type = "dependencywheel", 
+            width = "100%")
+```
+
+# NCF Alumn Data 
+
+### Read data
+```{r}
+mypath <- "../data/NCAlumn.csv"
+alumn <- read.csv(file=mypath, na.strings=c("", "NA"))
+```
+
+### Recode industry information
+```{r}
+div1 <- alumn %>% select(DIVISION_1, Industry) %>%
+  filter(! is.na(DIVISION_1)) %>%
+  filter(! is.na(Industry)) %>%
+  mutate(Industry=as.character(Industry)) %>%
+  mutate(Industry = fct_collapse(Industry,
+    Entertaintment = c("Arts","Media", "Music","Entertainment", "Journalism",
+                       "Publishing", "Archaeology", "Arts & Entertainment",
+                       "Film", "Performing Arts", "Architecture", "Communications",
+                       "Antiques", "Hospitality", "Online Media", "Advertising",
+                       "Art", "Religion", "Photography", "Library", "Museums and Institutions"),
+    Health = c("Healthcare", "Medical", "Health & Fitness", "Healthcare Services",
+               "Medicine", "Psychotherapy", "Public Health", "Dentistry",
+               "Medical Research","Pharmaceutical", "Imaging"),
+    STEM = c("Software", "Technology", "Engineering","Information Technology","Research",
+             "Environmental", "Data Science", "Environmental Services", "IT Communications",
+             "Construction", "Environmental Science", "Software Design", "Computer Software",
+             "Electronics", "Home Improvement"),
+    Education = c("Education", "Educational Services", "Higher education", "Development", "Education / Training"),
+    Finances = c("Marketing", "Retail", "Financial Services", "Food", "Food Franchise",
+                         "Food Service", "Food and Lodging", "Restaurant", "Banking","Business Consulting",
+                         "Real Estate", "Business", "Consulting", "Insurance",
+                         "Manufacturing", "Health Care Consulting", "Human Resources",
+                         "International Economic Development Consulting", "Public Relations",
+                         "Accounting", "Investment banking", "Investments",
+                         "Non-profit consulting", "Medical Equipment", "Pet Food",
+                         "Shipping", "Sports Management", "Textiles",
+                         "Transportation", "Agriculture", "Farming"),
+    Government = c("Law", "Military", "Environmental Law","Attorney",
+                   "Non Profit", "Nonprofit", "Government", "City/County/State",
+                   "Community Services","Services", "Defense & Space","Economic Development",
+                   "International Relations", "Marine","Philanthropy")
+  )) %>%
+  mutate(DIVISION_1=as.character(DIVISION_1))
+
+div1
+```
+```{r}
+dataplot <- data_to_sankey(div1)
+
+dataplot
+```
+```{r}
+# Visualization with SankeyWheel
+sankeywheel(from = dataplot$from, 
+            to = dataplot$to, 
+            weight = dataplot$weight, 
+            type = "dependencywheel", 
+            width = "100%", 
+            title = "Academic Division vs. Industry")
+```
+
+```{r}
+plot <- hchart(dataplot, "dependencywheel", name = "Proffesional Career according to College Major")
+
+plot %>%
+hc_title(text= "College Major vs. Professional Career Industry") %>%
+hc_subtitle(text= "Where do NCF students work after graduating?")  %>%
+hc_caption(text = "<b>Data from New College of Florida<b>") %>%
+# hc_colors(c('red', 'grey', 'grey', 'grey', 'grey', 'grey', 'grey', 'blue', 'green', 'orange')) 
+hc_add_theme(hc_theme_economist()) 
+
+```
+
