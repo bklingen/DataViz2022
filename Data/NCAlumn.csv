@@ -591,7 +591,7 @@ ID,GRAD_YEAR,ACADEMIC_PROGRAM_1,DIVISION_1,ACADEMIC_PROGRAM_2,DIVISION_2,ACADEMI
 1010,2005,Psychology,Social Sciences,,,,,University of South Alabama,Resident Physician,Healthcare
 284,2013,Chemistry,Natural Sciences,,,,,OSRAM,Optical Engineer,Manufacturing
 640,2011,International and Area Studies,Interdisciplinary,,,,,CCG Analytics,Delivery Coordinator,Information Technology
-285,2004,Chemistry,Natural Sciences,,,,,L'OrÈal,Senior Scientist II,Research
+285,2004,Chemistry,Natural Sciences,,,,,L'Or√©al,Senior Scientist II,Research
 264,2007,Chemistry,Natural Sciences,,,,,General Atomics,Director of NIF Capsule Production,Manufacturing
 647,2013,International and Area Studies,Interdisciplinary,,,,,Lake County Superior Court,Family Law Facilitator/Self-Help Center Attorney,Law
 262,2003,Chemistry,Natural Sciences,,,,,Unknown,Attorney,Law
@@ -674,7 +674,7 @@ ID,GRAD_YEAR,ACADEMIC_PROGRAM_1,DIVISION_1,ACADEMIC_PROGRAM_2,DIVISION_2,ACADEMI
 875,2004,Political Science,Social Sciences,,,,,Hirschen Singer & Epstein LLP,Partner,
 1084,2011,Sociology,Social Sciences,,,,,Longhorn Steakhouse,Host,Food Service
 725,2008,Mathematics,Natural Sciences,,,,,Unknown,,Software
-350,2010,Economics,Social Sciences,,,,,Albert-Ludwigs Universit‰t Freiburg,Graduate Student,Education
+350,2010,Economics,Social Sciences,,,,,Albert-Ludwigs Universit√§t Freiburg,Graduate Student,Education
 342,2005,Economics,Social Sciences,,,,,Remy Moose Manley LLP,Summer Associate,Environmental Law
 343,2006,Economics,Social Sciences,,,,,Smart Data Science Solutions,Founder and Priciple Data Scientist,Business
 366,2009,Economics,Social Sciences,,,,,PowerDMS,Software Engineer,Software
@@ -1161,3 +1161,4 @@ ID,GRAD_YEAR,ACADEMIC_PROGRAM_1,DIVISION_1,ACADEMIC_PROGRAM_2,DIVISION_2,ACADEMI
 1106,2009,Sociology,Social Sciences,,,,,Planned Parenthood of New York City,VP of Individual Giving & Events,
 1094,2006,Sociology,Social Sciences,,,,,Prevention Institute,,
 1066,2007,Russian Language and Literature,Humanities,,,,,Collier County Public Schools- Golden Gate High School,Language Arts/ AP Literature Teacher,Education
+1066,2007,Russian Language and Literature,Humanities,,,,,Collier County Public Schools- Golden Gate High School,Language Arts/ AP Literature Teacher,XXXtest
