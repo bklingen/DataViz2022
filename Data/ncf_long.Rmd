@@ -10,17 +10,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(tidyverse)
-library(haven)
-mypath <- 'C:/DataSci/Classes/Data Vis/Data/NCAlumn.csv'
+library(readr)
+mypath <- 'https://raw.githubusercontent.com/bklingen/DataViz2022/main/Data/NCAlumnIndustry2.csv'
 df <- read_csv(file=mypath)
 ```
 
 ```{r}
-
+library(dplyr)
+library(tidyr)
 ncf <- df %>% 
-  filter(! is.na(Industry)) %>%
-  
+
   #temporary pivot_longer to collapse DIVISION and AOC 
   #(values_to can only output 1 column, but we need 2 columns for DIVISION and AOC)
   pivot_longer(cols=c(ACADEMIC_PROGRAM_1,ACADEMIC_PROGRAM_2,ACADEMIC_PROGRAM_3,
@@ -38,6 +37,10 @@ ncf <- df %>%
   filter(! is.na(AOC)) %>%
 
   #reordering columns 
-  select(ID,GRAD_YEAR,AOC_num,AOC,DIVISION,Industry,Position,Org_Name)
+  select(ID,GRAD_YEAR,AOC_num,AOC,DIVISION,Industry2,Position,Org_Name)
+
+### write file to Github repository:
+# write_csv(ncf, file='C:/Teaching/NewCollege/DataViz/DataViz2022/Data/NCAlumnIndustry2Long.csv')
+
 ```
 
