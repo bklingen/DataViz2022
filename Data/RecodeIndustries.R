@@ -47,3 +47,5 @@ NCdata1 = NCdata %>%
          )
   )
 
+### write file to local directory and then push to Github:
+# write_csv(NCdata1, file='C:/Teaching/NewCollege/DataViz/DataViz2022/Data/NCAlumnIndustry2.csv')

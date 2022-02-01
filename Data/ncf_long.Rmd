@@ -14,6 +14,24 @@ library(readr)
 mypath <- 'https://raw.githubusercontent.com/bklingen/DataViz2022/main/Data/NCAlumnIndustry2.csv'
 df <- read_csv(file=mypath)
 ```
+```{r}
+dfLongAcademic = df %>% pivot_longer(
+  cols = starts_with(c("ACADEMIC", "DIVISION")),
+  names_to = c("AOC_Number", "Division_Number"),
+  names_pattern = "",
+  values_to = "AOC",
+  values_drop_na = TRUE
+)
+
+dfLongAcademicDivision = dfLongAcademic %>% pivot_longer(
+  cols = starts_with("Division"),
+  names_to = "Division_Number",
+  names_prefix = "DIVISION_",
+  values_to = "Division",
+  values_drop_na = TRUE
+)
+```
+
 
 ```{r}
 library(dplyr)
@@ -22,24 +40,33 @@ ncf <- df %>%
 
   #temporary pivot_longer to collapse DIVISION and AOC 
   #(values_to can only output 1 column, but we need 2 columns for DIVISION and AOC)
-  pivot_longer(cols=c(ACADEMIC_PROGRAM_1,ACADEMIC_PROGRAM_2,ACADEMIC_PROGRAM_3,
-                      DIVISION_1,DIVISION_2, DIVISION_3),
-               names_to=c("temp", ".value"), 
-               names_pattern = "(.+)_(.+)") %>% 
+  pivot_longer(cols =c(ACADEMIC_PROGRAM_1,
+                       ACADEMIC_PROGRAM_2,
+                       ACADEMIC_PROGRAM_3,
+                       DIVISION_1,
+                       DIVISION_2,
+                       DIVISION_3),
+               names_to = c("temp", ".value"), 
+               names_pattern = "(.+)_(.+)",
+               ) %>% 
   
   #collapsing the 3 AOCs to 1 column
-  pivot_longer(cols=c("1","2","3"), names_to = "AOC_num", values_to = "AOC") %>%
+  pivot_longer(cols = c("1","2","3"), 
+               names_to = "AOC_num", 
+               values_to = "AOC",
+               values_drop_na = TRUE
+               ) %>%
   
   #breaking AOC and DIVISION into 2 columns again
-  pivot_wider(names_from = "temp", values_from = "AOC") %>% 
+  pivot_wider(names_from = "temp", 
+              values_from = "AOC") %>% 
   
   rename(AOC = ACADEMIC_PROGRAM) %>% 
-  filter(! is.na(AOC)) %>%
 
   #reordering columns 
   select(ID,GRAD_YEAR,AOC_num,AOC,DIVISION,Industry2,Position,Org_Name)
 
-### write file to Github repository:
+### write file to local directory and then push to Github:
 # write_csv(ncf, file='C:/Teaching/NewCollege/DataViz/DataViz2022/Data/NCAlumnIndustry2Long.csv')
 
 ```
