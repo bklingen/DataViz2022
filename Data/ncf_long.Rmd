@@ -14,24 +14,6 @@ library(readr)
 mypath <- 'https://raw.githubusercontent.com/bklingen/DataViz2022/main/Data/NCAlumnIndustry2.csv'
 df <- read_csv(file=mypath)
 ```
-```{r}
-dfLongAcademic = df %>% pivot_longer(
-  cols = starts_with(c("ACADEMIC", "DIVISION")),
-  names_to = c("AOC_Number", "Division_Number"),
-  names_pattern = "",
-  values_to = "AOC",
-  values_drop_na = TRUE
-)
-
-dfLongAcademicDivision = dfLongAcademic %>% pivot_longer(
-  cols = starts_with("Division"),
-  names_to = "Division_Number",
-  names_prefix = "DIVISION_",
-  values_to = "Division",
-  values_drop_na = TRUE
-)
-```
-
 
 ```{r}
 library(dplyr)
