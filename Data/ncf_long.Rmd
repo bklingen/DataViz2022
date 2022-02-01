@@ -1,7 +1,6 @@
 ---
-title: "NCF_Alum"
-author: "Paul"
-date: "1/17/2022"
+title: "Converting NCF Alumn Data into Long Format"
+author: "Data Viz Class 2022"
 output: html_document
 ---
 
@@ -46,10 +45,9 @@ ncf <- df %>%
   rename(AOC = ACADEMIC_PROGRAM) %>% 
 
   #reordering columns 
-  select(ID,GRAD_YEAR,AOC_num,AOC,DIVISION,Industry2,Position,Org_Name)
+  select(ID,GRAD_YEAR,AOC_num,AOC,DIVISION,Industry, Industry2,Position,Org_Name)
 
 ### write file to local directory and then push to Github:
-# write_csv(ncf, file='C:/Teaching/NewCollege/DataViz/DataViz2022/Data/NCAlumnIndustry2Long.csv')
-
+write_csv(ncf, file='C:/Teaching/NewCollege/DataViz/DataViz2022/Data/NCAlumnIndustry2Long.csv')
 ```
 
