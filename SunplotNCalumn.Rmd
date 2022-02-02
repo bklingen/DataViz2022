@@ -1,0 +1,49 @@
+---
+title: "Sunburst Plot of NCF Alumn data"
+author: "Data Viz 2022 class"
+date: "2/1/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Reading dataset in Long Format:
+```{r}
+library(readr)
+mypath <- 'https://raw.githubusercontent.com/bklingen/DataViz2022/main/Data/NCAlumnIndustry2Long.csv'
+df <- read_csv(file=mypath)
+```
+
+Let's see how many students fall in each of the `Industry2` categories:
+```{r}
+library(dplyr)
+df %>% count(Industry2, sort=TRUE)
+```
+Note that this double counts students who have double or triple majors (AOC's). E.g., a student with two AOCs is counted twice.
+
+Now, let's see how within an `Industry2` code, e.g., `Government and Social Services`, the Industries (variable `Industry`) are distributed:
+```{r}
+df %>% 
+  filter(Industry2 == "Government and Social Services") %>% 
+  count(Industry, sort=TRUE)
+```
+
+I would say we take some top percentage of the Industries within each Industry2 label, which we plot as the "outer" ring in the sunburst chart. Here is one idea to go about this, but it may be wrong. Also, I dropped the "Other" category for `Industry2`:
+```{r}
+library(forcats)
+df1 = df %>% 
+  filter(Industry2 != 'Other') %>% 
+  group_by(Industry2) %>% 
+  mutate(Industry2.1 = fct_lump_prop(Industry, 0.05)) %>% count(Industry2.1)
+
+df1
+```
+
+Wit hthis infomration in `df1`, I hope you can create the Sunburst plot. Look up the help for sunburst plot in plotyly. I think the third example might be helpful, where they define `ids`, but I'm not certain. (But we would need `values`, in the example everything seems to have equal weight.)
+```{r}
+library(plotly)
+
+
+```
