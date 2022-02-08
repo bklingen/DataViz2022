@@ -1,0 +1,54 @@
+---
+title: "NCF_Careers_Sankey"
+author: "Marina Sanchez, Mileva Van Tuyl, Richard Bridges"
+date: "1/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### SANKEY DIAGRAM ###
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(highcharter)
+
+mypath <- "../Data/NCAlumnIndustry2Long.csv"
+alumn <- read.csv(file=mypath, na.strings=c("", "NA"))
+dim(alumn)
+summary(alumn)
+colnames(alumn)
+head(alumn)
+
+div1_ind <- alumn %>% select(DIVISION, Industry2) %>%
+  filter(! is.na(DIVISION)) %>%
+  filter(! is.na(Industry2)) %>%
+  mutate(DIVISION=as.character(DIVISION))
+
+#Final dataframe
+names(div1_ind) <- c('College Major', 'Proffesional Career') #Rename columns
+#div1_ind
+
+#Fake testing data
+#division <- c("Humanities", "Interdisciplinary", "Natural Science", "Social Science")
+#industry <- c('Finance Business', 'Entertainment', 'Government', 'STEM', 'Health', 'Education')
+# t1 <- sample(x = division , size = 100, replace=TRUE)
+# #t2 <- sample(x = c("Male", "Female")   , size = 100, replace=TRUE)
+# t2 <- sample(x = industry , size = 100, replace=TRUE)
+# d <- data.frame(cbind(t1,t2))
+# d
+# names(d) <- c('College Major', 'Proffesional Career')
+# head(d)
+
+# First Sankey diagram
+plot <- hchart(data_to_sankey(div1_ind), "sankey", name = "Proffesional Career according to College Major")
+
+plot %>%
+hc_title(text= "College Major vs. Professional Career Industry") %>%
+hc_subtitle(text= "Where do NCF students work after graduating?")  %>%
+hc_caption(text = "<b>Data from New College of Florida<b>")%>%
+hc_add_theme(hc_theme_economist())
+```
