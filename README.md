@@ -1,4 +1,4 @@
-# DataViz2022
+# DataViz2025
 Sanky Chart based on New College Alumn Data
 
 - Be careful: "Non Profit" vs. "Nonprofit"
